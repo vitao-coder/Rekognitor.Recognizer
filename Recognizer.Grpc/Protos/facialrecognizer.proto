@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option csharp_namespace = "Recognizer.Grpc";
+option go_package = "github.com/vitao-coder/rekognitor/recognizer";
+
+package recognizer;
+
+service Recognizer {
+  rpc FacialDetection (DetectionRequest) returns (DetectionReply);
+  rpc FacialComparison (ComparisonRequest) returns (ComparisonReply);
+}
+
+message DetectionRequest {  
+	string request_id = 1;  
+	bytes image_bytes = 2;
+}
+
+message ComparisonRequest {
+	string request_id = 1;
+	bytes image1_bytes = 2;
+	bytes image2_bytes = 3;
+}
+
+message DetectionReply {
+	string request_id = 1;  
+}
+
+message ComparisonReply {
+	string request_id = 1;  
+}
