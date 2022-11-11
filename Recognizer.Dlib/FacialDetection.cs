@@ -9,26 +9,21 @@ namespace Recognizer.Dlib.Wrapper
 
      public class FacialDetection : IFacialDetection, IDisposable
     {
-
-        FrontalFaceDetector _frontalFaceDetector;
         ShapePredictor _shapePredictor;
         LossMetric _lossMetric;
         string _appFolder;
         bool _enableJittering;
         readonly IModelLoader _modelLoader;
+        readonly FrontalFaceDetector _frontalFaceDetector;
 
-        public FacialDetection(IModelLoader modelLoader) {
+        public FacialDetection(IModelLoader modelLoader, FrontalFacialDetector detector, ShapePrediction predictor, LossMetrics lossMetrics) {
             _appFolder = Environment.CurrentDirectory;
             _modelLoader = modelLoader;
 
-            _frontalFaceDetector = DlibDotNet.Dlib.GetFrontalFaceDetector();            
-            _enableJittering = false;
-
-            var shapePredictor = modelLoader.GetModel((int)AVAIABLE_MODELS.ShapePredictor68MarksGTX);
-            _shapePredictor = ShapePredictor.Deserialize(shapePredictor.Data);
-
-            var lossMetric = modelLoader.GetModel((int)AVAIABLE_MODELS.RessNet);
-            _lossMetric = LossMetric.Deserialize(lossMetric.Data);
+            _shapePredictor = predictor.GetShapePredictor();
+            _frontalFaceDetector = detector.GetFrontalFacialDetector();
+            _lossMetric = lossMetrics.GetLossMetrics();
+            _enableJittering = false;            
         }
         
 
@@ -129,10 +124,8 @@ namespace Recognizer.Dlib.Wrapper
         }
 
         public void Dispose()
-        {
-            _frontalFaceDetector.Dispose();
-            _shapePredictor.Dispose();
-            _lossMetric.Dispose();
+        {   
+            
         }
 
     }
