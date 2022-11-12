@@ -10,7 +10,7 @@ namespace Recognizer.Grpc
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddScoped<IFacialDetection, FacialDetection>();
-            builder.Services.AddScoped<FrontalFacialDetector>();
+            builder.Services.AddSingleton<FrontalFacialDetector>();
 
             builder.Services.AddSingleton<IModelLoader, ModelLoader>();            
             builder.Services.AddSingleton<ShapePrediction>(); 
@@ -23,6 +23,7 @@ namespace Recognizer.Grpc
             app.Services.GetService<IModelLoader>();
             app.Services.GetService<ShapePrediction>();
             app.Services.GetService<LossMetrics>();
+            app.Services.GetService<FrontalFacialDetector>();
 
 
             app.MapGrpcService<FacialRecognizer>();

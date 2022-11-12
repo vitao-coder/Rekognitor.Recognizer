@@ -19,8 +19,8 @@ namespace Recognizer.Grpc.Services
         {                        
             if (request.ImageBytes == null) throw new Exception("image bytes null");
 
-            var descriptor = _detection.FacialDetector(request.ImageBytes.ToByteArray());
-            _detection.Dispose();
+            var descriptor = _detection.FacialDetector(request.ImageBytes.ToByteArray());            
+
             return Task.FromResult(new DetectionReply
             {
                 RequestId = descriptor.ToString()

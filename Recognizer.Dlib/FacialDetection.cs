@@ -28,8 +28,8 @@ namespace Recognizer.Dlib.Wrapper
         
 
         public float[]? FacialDetector(byte[] image) {
-            Stopwatch timer = new Stopwatch();
-            timer.Start();
+           // Stopwatch timer = new Stopwatch();
+           // timer.Start();
             var tempFileName = Guid.NewGuid().ToString();
             var filePath = _appFolder +@"\temp\"+ tempFileName + ".jpg";
 
@@ -109,8 +109,8 @@ namespace Recognizer.Dlib.Wrapper
             finally
             {   
                 File.Delete(filePath);
-                Console.WriteLine("Detection total time " + timer.Elapsed.ToString() + "\n\n");
-                timer.Stop();
+                //Console.WriteLine("Detection total time " + timer.Elapsed.ToString() + "\n\n");
+               // timer.Stop();
             }
             
         }
@@ -124,8 +124,10 @@ namespace Recognizer.Dlib.Wrapper
         }
 
         public void Dispose()
-        {   
-            
+        {
+            /*_shapePredictor.Dispose();
+            _frontalFaceDetector.Dispose();
+            _lossMetric.Dispose();*/
         }
 
     }
