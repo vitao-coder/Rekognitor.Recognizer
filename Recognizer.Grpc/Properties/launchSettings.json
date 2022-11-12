@@ -19,7 +19,11 @@
     "Docker": {
       "commandName": "Docker",
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
-      "publishAllPorts": true
+      "publishAllPorts": true,
+      "useSSL": true,
+      "httpPort": 8009,
+      "sslPort": 8010,
+      "DockerfileRunArguments": "--privileged --mount source=tempVol,target=/app/temp/"
     }
   }
 }

@@ -1,6 +1,7 @@
 ﻿using DlibDotNet;
 using DlibDotNet.Dnn;
 using Recognizer.IOC;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Drawing;
 
@@ -27,55 +28,68 @@ namespace Recognizer.Dlib.Wrapper
         }
         
 
-        public float[]? FacialDetector(byte[] image) {
-           // Stopwatch timer = new Stopwatch();
-           // timer.Start();
+        public float[]? FacialDetector(byte[] image, out string processMessage) {           
             var tempFileName = Guid.NewGuid().ToString();
-            var filePath = _appFolder +@"\temp\"+ tempFileName + ".jpg";
+            var filePath = _appFolder +@"/temp/"+ tempFileName + ".jpg";
 
-            var fileStr = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write);
-            using (var fs = new BinaryWriter(fileStr))
+            using (var fileStr = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write))
             {
-                fs.Write(image);
+                using (var fs = new BinaryWriter(fileStr))
+                {
+                    fs.Write(image);
+                }
+                fileStr.Close();
             }
-            fileStr.Close();
 
             Matrix<RgbPixel> faceExtracted;
             DlibDotNet.Rectangle faceDetected;
 
             try
             {
-                
+                float[]? returnFaceDesc = new float[128];
+       
                 using (var img = DlibDotNet.Dlib.LoadImageAsMatrix<RgbPixel>(filePath))
                 {
-                    var facesDetector = _frontalFaceDetector.Operator(img);
+
+                    DlibDotNet.Rectangle[] facesDetector;
+                    lock (_frontalFaceDetector)
+                    {
+                        facesDetector = _frontalFaceDetector.Operator(img);
+                    }
 
                     if (!facesDetector.Any())
                     {
+                        processMessage = "face not encountered";
                         return null;
                     }
 
                     if (facesDetector.Length != 1)
                     {
+                        processMessage = "multiple  encountered";
                         return null;
                     }
 
-                    faceDetected = facesDetector[0];                    
-                    var shape = _shapePredictor.Detect(img, faceDetected);
-                    
-                    var faceChipDetail = DlibDotNet.Dlib.GetFaceChipDetails(shape,150,0.24);
-                    
+                    faceDetected = facesDetector[0];
+                    FullObjectDetection shape;
+                    lock (_shapePredictor) {
+                        shape = _shapePredictor.Detect(img, faceDetected);
+                    }
+                    var faceChipDetail = DlibDotNet.Dlib.GetFaceChipDetails(shape, 150, 0.24);
+
                     faceExtracted = DlibDotNet.Dlib.ExtractImageChip<RgbPixel>(img, faceChipDetail);
-                    
+
                     faceChipDetail.Dispose();
-                    shape.Dispose();                    
+                    shape.Dispose();
                 }
-                
-                var faceDescriptors = _lossMetric.Operator(faceExtracted);
-                var faceDescriptor = faceDescriptors[0];                
+
+                OutputLabels<Matrix<float>> faceDescriptors;
+                lock (_lossMetric) {
+                    faceDescriptors = _lossMetric.Operator(faceExtracted);
+                }
+                var faceDescriptor = faceDescriptors[0];
 
                 var finalDescriptorWithoutJittering = DlibDotNet.Dlib.Trans(faceDescriptor);
-                
+
                 if (_enableJittering)
                 {
                     using (var jittered = DlibDotNet.Dlib.Trans(faceDescriptor))
@@ -84,7 +98,7 @@ namespace Recognizer.Dlib.Wrapper
                         var ret = _lossMetric.Operator(jitterImage);
                         var m = DlibDotNet.Dlib.Mat(ret);
                         var faceDescriptoMat = DlibDotNet.Dlib.Mean<float>(m);
-                        
+
                         using (var t = DlibDotNet.Dlib.Trans(faceDescriptoMat))
                         {
                             jitterImage.Dispose();
@@ -95,11 +109,12 @@ namespace Recognizer.Dlib.Wrapper
                         faceDescriptoMat.Dispose();
                     }
                 }
+                returnFaceDesc = faceDescriptor.ToImmutableArray().ToArray();
                 faceDescriptor.Dispose();
                 faceDescriptors.Dispose();
-                finalDescriptorWithoutJittering.Dispose();                               
-
-                return new float[] { };
+                finalDescriptorWithoutJittering.Dispose();
+                processMessage = "sucess";
+                return returnFaceDesc;
             }
             catch (Exception ex)
             {
@@ -107,12 +122,9 @@ namespace Recognizer.Dlib.Wrapper
 
             }
             finally
-            {   
+            {
                 File.Delete(filePath);
-                //Console.WriteLine("Detection total time " + timer.Elapsed.ToString() + "\n\n");
-               // timer.Stop();
-            }
-            
+            }     
         }
 
         private static Matrix<RgbPixel> JitterImage(Matrix<RgbPixel> img)
@@ -125,10 +137,7 @@ namespace Recognizer.Dlib.Wrapper
 
         public void Dispose()
         {
-            /*_shapePredictor.Dispose();
-            _frontalFaceDetector.Dispose();
-            _lossMetric.Dispose();*/
+        
         }
-
     }
 }

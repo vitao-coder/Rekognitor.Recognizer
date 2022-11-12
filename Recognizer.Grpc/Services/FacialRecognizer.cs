@@ -16,25 +16,29 @@ namespace Recognizer.Grpc.Services
         }
 
         public override Task<DetectionReply> FacialDetection(DetectionRequest request, ServerCallContext context)
-        {                        
-            if (request.ImageBytes == null) throw new Exception("image bytes null");
-
-            var descriptor = _detection.FacialDetector(request.ImageBytes.ToByteArray());            
-
-            return Task.FromResult(new DetectionReply
-            {
-                RequestId = descriptor.ToString()
-            });
-
-        }
-
-
-        public override Task<ComparisonReply> FacialComparison(ComparisonRequest request, ServerCallContext context)
         {
-            return Task.FromResult(new ComparisonReply
+            if (request.ImageBytes == null) throw new Exception("image bytes null");
+            string outMessage;
+            var descriptor = _detection.FacialDetector(request.ImageBytes.ToByteArray(), out outMessage);
+            if (descriptor != null)
             {
-                RequestId = Guid.NewGuid().ToString(),
-            });
+                array128D array128D = new array128D();
+                array128D.Array.AddRange(descriptor);
+
+                return Task.FromResult(new DetectionReply
+                {
+                    RequestId = request.RequestId,
+                    Array128D = array128D,
+                    StatusMessage = outMessage,
+                });
+            }
+
+            return Task.FromResult(
+                new DetectionReply
+                {
+                    RequestId = request.RequestId,
+                    StatusMessage = outMessage,
+                });
         }
     }
 }

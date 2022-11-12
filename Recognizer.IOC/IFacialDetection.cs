@@ -2,7 +2,6 @@
 {
     public interface IFacialDetection
     {
-        public float[]? FacialDetector(byte[] image);
-        void Dispose();
+        float[]? FacialDetector(byte[] image, out string processMessage);
     }
 }

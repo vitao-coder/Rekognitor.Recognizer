@@ -37,7 +37,7 @@ WORKDIR "/src/Recognizer.Grpc"
 RUN dotnet build "Recognizer.Grpc.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Recognizer.Grpc.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Recognizer.Grpc.csproj" -c Release -o /app/publish /p:UseAppHost=true
 
 FROM base AS final
 WORKDIR /app
@@ -55,7 +55,15 @@ CMD pwsh ./Build.ps1 <Release/Debug> <cpu/cuda/mkl> <32/64> <desktop/uwp> <optio
 
 WORKDIR /app/
 RUN rm -rf /app/Dlib/
-RUN ls
+RUN rm -rf /app/runtimes/centos-x64
+RUN rm -rf /app/runtimes/osx-x64
+RUN rm -rf /app/runtimes/win
+RUN rm -rf /app/runtimes/win-x86
+RUN rm -rf /app/runtimes/win-x64
+RUN apt-get -s remove powershell
+RUN apt-get -s remove git
+RUN apt-get -s remove curl
+RUN apt-get -s remove apt-transport-https
 RUN apt autoremove
 
-#ENTRYPOINT ["dotnet", "Recognizer.Grpc.dll"]
+ENTRYPOINT ["dotnet", "Recognizer.Grpc.dll"]
