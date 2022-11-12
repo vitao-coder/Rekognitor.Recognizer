@@ -23,7 +23,7 @@
       "useSSL": true,
       "httpPort": 8009,
       "sslPort": 8010,
-      "DockerfileRunArguments": "--privileged --mount source=tempVol,target=/app/temp/"
+      "DockerfileRunArguments": "--privileged --mount source=tempVol,target=/app/temp/ --memory-reservation 500m -m 650m --memory-swap 651m"
     }
   }
 }

@@ -37,6 +37,7 @@ namespace Recognizer.Dlib.Wrapper
                 using (var fs = new BinaryWriter(fileStr))
                 {
                     fs.Write(image);
+                    fs.Close();
                 }
                 fileStr.Close();
             }
@@ -88,7 +89,7 @@ namespace Recognizer.Dlib.Wrapper
                 }
                 var faceDescriptor = faceDescriptors[0];
 
-                var finalDescriptorWithoutJittering = DlibDotNet.Dlib.Trans(faceDescriptor);
+                //var finalDescriptorWithoutJittering = DlibDotNet.Dlib.Trans(faceDescriptor);
 
                 if (_enableJittering)
                 {
@@ -112,7 +113,8 @@ namespace Recognizer.Dlib.Wrapper
                 returnFaceDesc = faceDescriptor.ToImmutableArray().ToArray();
                 faceDescriptor.Dispose();
                 faceDescriptors.Dispose();
-                finalDescriptorWithoutJittering.Dispose();
+                //finalDescriptorWithoutJittering.Dispose();
+                faceExtracted.Dispose();
                 processMessage = "sucess";
                 return returnFaceDesc;
             }
@@ -123,7 +125,7 @@ namespace Recognizer.Dlib.Wrapper
             }
             finally
             {
-                File.Delete(filePath);
+                File.Delete(filePath);                
             }     
         }
 
