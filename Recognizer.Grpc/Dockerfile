@@ -66,4 +66,4 @@ RUN apt-get -s remove curl
 RUN apt-get -s remove apt-transport-https
 RUN apt autoremove
 
-ENTRYPOINT ["dotnet", "Recognizer.Grpc.dll"]
+CMD ["dotnet", "Recognizer.Grpc.dll"]

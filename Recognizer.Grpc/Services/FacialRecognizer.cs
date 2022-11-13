@@ -24,7 +24,7 @@ namespace Recognizer.Grpc.Services
             {
                 array128D array128D = new array128D();
                 array128D.Array.AddRange(descriptor);
-
+                
                 return Task.FromResult(new DetectionReply
                 {
                     RequestId = request.RequestId,

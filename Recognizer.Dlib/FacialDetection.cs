@@ -55,7 +55,7 @@ namespace Recognizer.Dlib.Wrapper
                     DlibDotNet.Rectangle[] facesDetector;
                     lock (_frontalFaceDetector)
                     {
-                        facesDetector = _frontalFaceDetector.Operator(img);
+                        facesDetector = _frontalFaceDetector.Operator(img);                        
                     }
 
                     if (!facesDetector.Any())
@@ -73,7 +73,7 @@ namespace Recognizer.Dlib.Wrapper
                     faceDetected = facesDetector[0];
                     FullObjectDetection shape;
                     lock (_shapePredictor) {
-                        shape = _shapePredictor.Detect(img, faceDetected);
+                        shape = _shapePredictor.Detect(img, faceDetected);                        
                     }
                     var faceChipDetail = DlibDotNet.Dlib.GetFaceChipDetails(shape, 150, 0.24);
 
@@ -86,10 +86,9 @@ namespace Recognizer.Dlib.Wrapper
                 OutputLabels<Matrix<float>> faceDescriptors;
                 lock (_lossMetric) {
                     faceDescriptors = _lossMetric.Operator(faceExtracted);
+                    _lossMetric.Clean();
                 }
                 var faceDescriptor = faceDescriptors[0];
-
-                //var finalDescriptorWithoutJittering = DlibDotNet.Dlib.Trans(faceDescriptor);
 
                 if (_enableJittering)
                 {
@@ -112,8 +111,7 @@ namespace Recognizer.Dlib.Wrapper
                 }
                 returnFaceDesc = faceDescriptor.ToImmutableArray().ToArray();
                 faceDescriptor.Dispose();
-                faceDescriptors.Dispose();
-                //finalDescriptorWithoutJittering.Dispose();
+                faceDescriptors.Dispose();                
                 faceExtracted.Dispose();
                 processMessage = "sucess";
                 return returnFaceDesc;
@@ -139,7 +137,7 @@ namespace Recognizer.Dlib.Wrapper
 
         public void Dispose()
         {
-        
+            GC.Collect();
         }
     }
 }
