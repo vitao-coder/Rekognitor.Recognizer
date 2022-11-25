@@ -13,7 +13,7 @@ namespace Recognizer.Dlib.Wrapper
     public class ShapePrediction : IDisposable
     {
         readonly IModelLoader _modelLoader;
-        readonly ShapePredictor _shapePredictor;
+        readonly ShapePredictor? _shapePredictor;
 
         public ShapePrediction(IModelLoader modelLoader)
         {
@@ -23,11 +23,11 @@ namespace Recognizer.Dlib.Wrapper
                 _shapePredictor = ShapePredictor.Deserialize(shapePredictor.Data);
         }
 
-        public ShapePredictor GetShapePredictor() 
+        public ShapePredictor GetShapePredictor()
         {
             return _shapePredictor;
         }
-
+        
         public void Dispose()
         {
             _shapePredictor.Dispose();

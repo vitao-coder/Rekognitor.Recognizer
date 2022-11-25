@@ -10,20 +10,17 @@ namespace Recognizer.Dlib.Wrapper
 
      public class FacialDetection : IFacialDetection, IDisposable
     {
-        ShapePredictor _shapePredictor;
-        LossMetric _lossMetric;
+        readonly ShapePrediction _shapePrediction;
+        readonly LossMetrics _lossMetrics;
         string _appFolder;
-        bool _enableJittering;
-        readonly IModelLoader _modelLoader;
-        readonly FrontalFaceDetector _frontalFaceDetector;
+        bool _enableJittering;        
+        readonly FrontalFacialDetector _frontalFacialDetector;
 
-        public FacialDetection(IModelLoader modelLoader, FrontalFacialDetector detector, ShapePrediction predictor, LossMetrics lossMetrics) {
-            _appFolder = Environment.CurrentDirectory;
-            _modelLoader = modelLoader;
-
-            _shapePredictor = predictor.GetShapePredictor();
-            _frontalFaceDetector = detector.GetFrontalFacialDetector();
-            _lossMetric = lossMetrics.GetLossMetrics();
+        public FacialDetection(FrontalFacialDetector detector, ShapePrediction predictor, LossMetrics lossMetrics) {
+            _appFolder = Environment.CurrentDirectory;            
+            _shapePrediction = predictor;
+            _frontalFacialDetector = detector;
+            _lossMetrics = lossMetrics;
             _enableJittering = false;            
         }
         
@@ -47,6 +44,10 @@ namespace Recognizer.Dlib.Wrapper
 
             try
             {
+                var _frontalFaceDetector = _frontalFacialDetector.GetFrontalFacialDetector();
+                var _shapePredictor = _shapePrediction.GetShapePredictor();
+                var _lossMetric = _lossMetrics.GetLossMetrics();
+
                 float[]? returnFaceDesc = new float[128];
        
                 using (var img = DlibDotNet.Dlib.LoadImageAsMatrix<RgbPixel>(filePath))
@@ -88,9 +89,10 @@ namespace Recognizer.Dlib.Wrapper
                     faceDescriptors = _lossMetric.Operator(faceExtracted);
                     _lossMetric.Clean();
                 }
+                
                 var faceDescriptor = faceDescriptors[0];
 
-                if (_enableJittering)
+               /* if (_enableJittering)
                 {
                     using (var jittered = DlibDotNet.Dlib.Trans(faceDescriptor))
                     {
@@ -108,12 +110,12 @@ namespace Recognizer.Dlib.Wrapper
                         m.Dispose();
                         faceDescriptoMat.Dispose();
                     }
-                }
-                returnFaceDesc = faceDescriptor.ToImmutableArray().ToArray();
+                }*/
+                returnFaceDesc = faceDescriptor.ToImmutableArray().ToArray();                
                 faceDescriptor.Dispose();
                 faceDescriptors.Dispose();                
                 faceExtracted.Dispose();
-                processMessage = "sucess";
+                processMessage = "success";
                 return returnFaceDesc;
             }
             catch (Exception ex)
@@ -123,7 +125,12 @@ namespace Recognizer.Dlib.Wrapper
             }
             finally
             {
-                File.Delete(filePath);                
+                File.Delete(filePath);    
+                Console.WriteLine("Memory Load Bytes:" + GC.GetGCMemoryInfo().MemoryLoadBytes);
+                Console.WriteLine("Total Avaible Memory Bytes:" + GC.GetGCMemoryInfo().TotalAvailableMemoryBytes);
+                Console.WriteLine("Total Commited Bytes:" + GC.GetGCMemoryInfo().TotalCommittedBytes);
+                if (GC.GetGCMemoryInfo().MemoryLoadBytes > 0) 
+                    GC.AddMemoryPressure(GC.GetGCMemoryInfo().MemoryLoadBytes);
             }     
         }
 
@@ -137,7 +144,7 @@ namespace Recognizer.Dlib.Wrapper
 
         public void Dispose()
         {
-            GC.Collect();
+            
         }
     }
 }

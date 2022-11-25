@@ -53,46 +53,41 @@ namespace Recognizer.Dlib.Wrapper
         List<Model> models = new List<Model>();
         public ModelLoader()
         {
+            var _appFolder = Environment.CurrentDirectory;
+            string pathModels = _appFolder+ "/trainedmodels/";
+
+            var dlib_face_recognition_resnet_model_v1 = File.ReadAllBytes(pathModels+ "dlib_face_recognition_resnet_model_v1.dat");
+            var shape_predictor_68_face_landmarks = File.ReadAllBytes(pathModels + "shape_predictor_68_face_landmarks.dat");
+            var shape_predictor_68_face_landmarksGTX = File.ReadAllBytes(pathModels + "shape_predictor_68_face_landmarks_GTX.dat");
+
+
             models.Add(new Model() { 
                 modelType = AVAIABLE_MODELS.RessNet,
-                description = Properties.Resources.ressnet_lossmetrics,
-                data = Properties.Resources.dlib_face_recognition_resnet_model_v1,
-            });
-
-            models.Add(new Model()
-            {
-                modelType = AVAIABLE_MODELS.ShapePredictor5Marks,
-                description = Properties.Resources.shape_predictor_5,
-                data = Properties.Resources.shape_predictor_5_face_landmarks,
+                description = "Ress Net Model",
+                data = dlib_face_recognition_resnet_model_v1,
             });
 
             models.Add(new Model()
             {
                 modelType = AVAIABLE_MODELS.ShapePredictor68Marks,
-                description = Properties.Resources.shape_predictor_68,
-                data = Properties.Resources.shape_predictor_68_face_landmarks,
+                description = "68 Landmarks",
+                data = shape_predictor_68_face_landmarks,
             });
 
             models.Add(new Model()
             {
                 modelType = AVAIABLE_MODELS.ShapePredictor68MarksGTX,
-                description = Properties.Resources.shape_predictor_68_gtx,
-                data = Properties.Resources.shape_predictor_68_face_landmarks_GTX,
-            });
-
-            models.Add(new Model()
-            {
-                modelType = AVAIABLE_MODELS.AgePredictor,
-                description = Properties.Resources.age_predictor,
-                data = Properties.Resources.dnn_age_predictor_v1,
+                description = "68 Landmarks GTX",
+                data = shape_predictor_68_face_landmarksGTX,
             });
 
         }
 
         public IModel? GetModel(int modelType)
         {
-            return models.FirstOrDefault(it=>it.modelType == (AVAIABLE_MODELS)modelType);
+            return models.FirstOrDefault(it => it.modelType == (AVAIABLE_MODELS)modelType);
         }
+        
 
         public void Dispose()
         {

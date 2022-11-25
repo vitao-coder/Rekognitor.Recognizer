@@ -13,13 +13,15 @@ namespace Recognizer.Dlib.Wrapper
     public class FrontalFacialDetector : IDisposable
     {
 
-        readonly FrontalFaceDetector _detector;
+        readonly FrontalFaceDetector? _detector;
         public FrontalFacialDetector()
         {
             _detector = DlibDotNet.Dlib.GetFrontalFaceDetector();
         }
 
-        public FrontalFaceDetector GetFrontalFacialDetector() => _detector;
+        public FrontalFaceDetector GetFrontalFacialDetector() {
+            return _detector;
+        }
 
         public void Dispose()
         {

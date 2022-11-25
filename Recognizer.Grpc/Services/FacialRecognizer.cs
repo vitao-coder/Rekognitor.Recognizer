@@ -19,12 +19,14 @@ namespace Recognizer.Grpc.Services
         {
             if (request.ImageBytes == null) throw new Exception("image bytes null");
             string outMessage;
-            var descriptor = _detection.FacialDetector(request.ImageBytes.ToByteArray(), out outMessage);
+            var bytArr = request.ImageBytes.ToByteArray();
+            var descriptor = _detection.FacialDetector(bytArr, out outMessage);
+            bytArr = null;
             if (descriptor != null)
             {
                 array128D array128D = new array128D();
                 array128D.Array.AddRange(descriptor);
-                
+                descriptor = null;
                 return Task.FromResult(new DetectionReply
                 {
                     RequestId = request.RequestId,

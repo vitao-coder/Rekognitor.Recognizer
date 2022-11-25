@@ -14,7 +14,7 @@ namespace Recognizer.Dlib.Wrapper
     {
         readonly IModelLoader _modelLoader;
 
-        readonly LossMetric _lossMetric;
+        readonly LossMetric? _lossMetric;
         public LossMetrics(IModelLoader modelLoader)
         {
             _modelLoader = modelLoader;
@@ -23,8 +23,7 @@ namespace Recognizer.Dlib.Wrapper
                 _lossMetric = LossMetric.Deserialize(lossMetric.Data);
         }
 
-        public LossMetric GetLossMetrics() 
-        {
+        public LossMetric GetLossMetrics() {
             return _lossMetric;
         }
 

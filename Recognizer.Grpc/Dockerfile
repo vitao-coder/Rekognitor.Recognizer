@@ -26,10 +26,14 @@ RUN apt-get update \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app/Dlib/
-RUN git clone https://github.com/takuya-takeuchi/DlibDotNet
+RUN git clone https://github.com/vitao-coder/DlibDotNet
+
+WORKDIR /app/
+COPY ["Recognizer.Dlib/TrainedModels/*.dat", "/app/trainedmodels/"]
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
+
 COPY ["Recognizer.Grpc/Recognizer.Grpc.csproj", "Recognizer.Grpc/"]
 RUN dotnet restore "Recognizer.Grpc/Recognizer.Grpc.csproj"
 COPY . .
@@ -60,10 +64,14 @@ RUN rm -rf /app/runtimes/osx-x64
 RUN rm -rf /app/runtimes/win
 RUN rm -rf /app/runtimes/win-x86
 RUN rm -rf /app/runtimes/win-x64
-RUN apt-get -s remove powershell
-RUN apt-get -s remove git
-RUN apt-get -s remove curl
-RUN apt-get -s remove apt-transport-https
-RUN apt autoremove
+
+RUN apt-get purge -y powershell 
+RUN apt-get purge -y git
+RUN apt-get purge -y curl
+RUN apt-get purge -y apt-transport-https
+RUN apt-get purge -y gnupg
+RUN apt autoremove -y
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get clean && rm -rf /etc/apt/sources.list.d/microsoft.list
 
 CMD ["dotnet", "Recognizer.Grpc.dll"]
