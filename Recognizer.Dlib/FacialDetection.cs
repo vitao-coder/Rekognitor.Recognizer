@@ -125,7 +125,7 @@ namespace Recognizer.Dlib.Wrapper
             }
             finally
             {
-                File.Delete(filePath);    
+               // File.Delete(filePath);    
                 Console.WriteLine("Memory Load Bytes:" + GC.GetGCMemoryInfo().MemoryLoadBytes);
                 Console.WriteLine("Total Avaible Memory Bytes:" + GC.GetGCMemoryInfo().TotalAvailableMemoryBytes);
                 Console.WriteLine("Total Commited Bytes:" + GC.GetGCMemoryInfo().TotalCommittedBytes);

@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     libdlib-dev \
     libopenblas-dev \
     liblapack-dev \
+    libgdiplus \
     libx11-6 \
     git \
     gnupg curl apt-transport-https \
@@ -26,7 +27,8 @@ RUN apt-get update \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app/Dlib/
-RUN git clone https://github.com/vitao-coder/DlibDotNet
+#RUN git clone https://github.com/vitao-coder/DlibDotNet
+RUN git clone https://github.com/takuya-takeuchi/DlibDotNet
 
 WORKDIR /app/
 COPY ["Recognizer.Dlib/TrainedModels/*.dat", "/app/trainedmodels/"]

@@ -10,7 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\facialrecognizer.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\comparator.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\detector.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Recognizer.Dlib\Recognizer.Dlib.Wrapper.csproj" />
+    <ProjectReference Include="..\Recognizer.FaceRecognition.Wrapper\Recognizer.FaceRecognition.Wrapper.csproj" />
     <ProjectReference Include="..\Recognizer.IOC\Recognizer.IOC.csproj" />
   </ItemGroup>
 

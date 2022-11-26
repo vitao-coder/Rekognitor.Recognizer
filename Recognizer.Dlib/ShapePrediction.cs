@@ -1,6 +1,7 @@
 ﻿using DlibDotNet;
 using DlibDotNet.Dnn;
 using Recognizer.IOC;
+using Recognizer.IOC.Shared;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;

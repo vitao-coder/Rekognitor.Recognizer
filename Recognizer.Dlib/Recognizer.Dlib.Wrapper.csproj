@@ -7,15 +7,15 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="DlibDotNet" Version="19.21.0.20220724" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\Recognizer.IOC\Recognizer.IOC.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DlibDotNet" Version="19.21.0.20220724" />
   </ItemGroup>
 
 </Project>

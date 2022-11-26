@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "RecognizerGrpc";
+option go_package = "github.com/vitao-coder/rekognitor/comparator";
+
+package comparator;
+
+service Comparator {  
+  rpc FacialComparison (ComparisonRequest) returns (ComparisonReply);  
+}
+
+message ComparisonRequest {  
+	string request_id = 1;  
+	bytes image_bytes1 = 2;
+	bytes image_bytes2 = 3;
+}
+
+message ComparisonReply {
+	string request_id = 1;  	
+	string statusMessage = 3;
+}
