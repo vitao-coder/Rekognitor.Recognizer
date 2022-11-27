@@ -1,19 +1,18 @@
 using Grpc.Core;
 using RecognizerGrpc;
 using Recognizer.IOC;
+using Recognizer.Grpc.Services.Math;
 
 namespace Recognizer.Grpc.Services
 {
     public class FacialComparator : Comparator.ComparatorBase
     {
-        private readonly ILogger<FacialComparator> _logger;        
-        private readonly IFaceComparison _comparison;
+        private readonly ILogger<FacialComparator> _logger;                
         private readonly IFacialDetection _detector;
 
-        public FacialComparator(ILogger<FacialComparator> logger, IFaceComparison comparison, IFacialDetection detector)
+        public FacialComparator(ILogger<FacialComparator> logger, IFacialDetection detector)
         {
-            _logger = logger;   
-            _comparison = comparison;
+            _logger = logger;               
             _detector = detector;
         }
 
@@ -34,18 +33,27 @@ namespace Recognizer.Grpc.Services
                 return _detector.FacialDetector(request.ImageBytes2.ToByteArray(), out outMessage);
             });
 
-            Task.WhenAll(detect1, detect2); 
+            Task.WhenAll(detect1, detect2);
 
-            var detectt1 = detect1.Result.Select(it => (double)it).ToArray();
-            var detectt2 = detect2.Result.Select(it => (double)it).ToArray();
+            var detectt1 = detect1.Result.Select(it => (double)it);
+            var detectt2 = detect2.Result.Select(it => (double)it);
 
-            var sameFace = _comparison.FacialComparator(detectt1, detectt2, out outMessage);
+            var euclidean = LrNorm.Euclidean<double>(detectt1.ToList(), detectt2.ToList());
+            var manhattan = LrNorm.Manhattan<double>(detectt1.ToList(), detectt2.ToList());
+            var cosine = Cosine.Distance<double>(detectt1.ToList(), detectt2.ToList());
+
+            var confidencePercentage = (100 - (cosine + euclidean));
+
 
             return Task.FromResult(
                 new ComparisonReply
                 {
                     RequestId = request.RequestId,
-                    StatusMessage = outMessage + " - result: " + sameFace.ToString(),
+                    StatusMessage = outMessage 
+                    + " - euclidean: " + euclidean.ToString() 
+                    + " - manhattan: " + manhattan.ToString() 
+                    + " - cosine: " + cosine.ToString()
+                    + " - confidencePercentage: " + confidencePercentage.ToString(),
                 });
         }
     }

@@ -1,9 +1,12 @@
 ﻿using DlibDotNet;
 using DlibDotNet.Dnn;
 using Recognizer.IOC;
+using Recognizer.IOC.Shared;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace Recognizer.Dlib.Wrapper
 {
@@ -25,19 +28,9 @@ namespace Recognizer.Dlib.Wrapper
         }
         
 
-        public float[]? FacialDetector(byte[] image, out string processMessage) {           
-            var tempFileName = Guid.NewGuid().ToString();
-            var filePath = _appFolder +@"/temp/"+ tempFileName + ".jpg";
+        public float[]? FacialDetector(byte[] image, out string processMessage) {
 
-            using (var fileStr = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write))
-            {
-                using (var fs = new BinaryWriter(fileStr))
-                {
-                    fs.Write(image);
-                    fs.Close();
-                }
-                fileStr.Close();
-            }
+            var bitmapImage = getBitmapFromBytes(image);
 
             Matrix<RgbPixel> faceExtracted;
             DlibDotNet.Rectangle faceDetected;
@@ -49,8 +42,9 @@ namespace Recognizer.Dlib.Wrapper
                 var _lossMetric = _lossMetrics.GetLossMetrics();
 
                 float[]? returnFaceDesc = new float[128];
-       
-                using (var img = DlibDotNet.Dlib.LoadImageAsMatrix<RgbPixel>(filePath))
+                               
+                
+                using (var img = LoadImageAsMatrixFromBitmap(bitmapImage))
                 {
 
                     DlibDotNet.Rectangle[] facesDetector;
@@ -92,7 +86,7 @@ namespace Recognizer.Dlib.Wrapper
                 
                 var faceDescriptor = faceDescriptors[0];
 
-               /* if (_enableJittering)
+               if (_enableJittering)
                 {
                     using (var jittered = DlibDotNet.Dlib.Trans(faceDescriptor))
                     {
@@ -110,7 +104,7 @@ namespace Recognizer.Dlib.Wrapper
                         m.Dispose();
                         faceDescriptoMat.Dispose();
                     }
-                }*/
+                }
                 returnFaceDesc = faceDescriptor.ToImmutableArray().ToArray();                
                 faceDescriptor.Dispose();
                 faceDescriptors.Dispose();                
@@ -125,7 +119,7 @@ namespace Recognizer.Dlib.Wrapper
             }
             finally
             {
-               // File.Delete(filePath);    
+                bitmapImage.Dispose();                
                 Console.WriteLine("Memory Load Bytes:" + GC.GetGCMemoryInfo().MemoryLoadBytes);
                 Console.WriteLine("Total Avaible Memory Bytes:" + GC.GetGCMemoryInfo().TotalAvailableMemoryBytes);
                 Console.WriteLine("Total Commited Bytes:" + GC.GetGCMemoryInfo().TotalCommittedBytes);
@@ -140,6 +134,122 @@ namespace Recognizer.Dlib.Wrapper
             var crop = new Matrix<RgbPixel>();
             crop = DlibDotNet.Dlib.JitterImage(img, rnd);
             return crop;
+        }
+
+        private Bitmap? getBitmapFromBytes(byte[] image)
+        {
+            using (var ms = new MemoryStream(image))
+            {
+                return new Bitmap(ms);
+            }
+
+            return null;
+        }
+
+        private unsafe static Matrix<RgbPixel>? LoadImageAsMatrixFromBitmap(Bitmap bitmap)
+        {
+            int width = bitmap.Width;
+            int height = bitmap.Height;
+            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, width, height);
+            PixelFormat pixelFormat = bitmap.PixelFormat;
+            Mode mode;
+            int num;
+            int num2;
+            switch (pixelFormat)
+            {
+                case PixelFormat.Format8bppIndexed:
+                    mode = Mode.Greyscale;
+                    num = 1;
+                    num2 = 1;
+                    break;
+                case PixelFormat.Format24bppRgb:
+                    mode = Mode.Rgb;
+                    num = 3;
+                    num2 = 3;
+                    break;
+                case PixelFormat.Format32bppRgb:
+                case PixelFormat.Format32bppArgb:
+                    mode = Mode.Rgb;
+                    num = 4;
+                    num2 = 3;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("bitmap", "The specified PixelFormat is not supported.");
+            }
+
+            BitmapData bitmapData = null;
+            try
+            {
+                bitmapData = bitmap.LockBits(rect, ImageLockMode.ReadOnly, pixelFormat);
+                byte[] array = new byte[width * height * num2];
+                try
+                {
+                    fixed (byte* ptr = &array[0])
+                    {
+                        byte* ptr2 = ptr;
+                        switch (num)
+                        {
+                            case 1:
+                                {
+                                    IntPtr scan = bitmapData.Scan0;
+                                    int stride2 = bitmapData.Stride;
+                                    for (int k = 0; k < height; k++)
+                                    {
+                                        Marshal.Copy(IntPtr.Add(scan, k * stride2), array, k * width, width * num2);
+                                    }
+
+                                    break;
+                                }
+                            case 3:
+                            case 4:
+                                {
+                                    byte* ptr3 = (byte*)(void*)bitmapData.Scan0;
+                                    int stride = bitmapData.Stride;
+                                    for (int i = 0; i < height; i++)
+                                    {
+                                        int num3 = i * stride;
+                                        int num4 = i * width * num2;
+                                        for (int j = 0; j < width; j++)
+                                        {
+                                            ptr2[num4 + j * num2] = ptr3[num3 + j * num + 2];
+                                            ptr2[num4 + j * num2 + 1] = ptr3[num3 + j * num + 1];
+                                            ptr2[num4 + j * num2 + 2] = ptr3[num3 + j * num];
+                                        }
+                                    }
+
+                                    break;
+                                }
+                        }
+
+                        IntPtr array2 = (IntPtr)ptr;
+                        switch (mode)
+                        {
+                            case Mode.Rgb:
+                                return new Matrix<RgbPixel>(array2, height, width, width * 3);
+                            case Mode.Greyscale:
+                                return null;
+                        }
+                    }
+                }
+                finally
+                {
+                }
+            }
+            finally
+            {
+                if (bitmapData != null)
+                {
+                    bitmap.UnlockBits(bitmapData);
+                }
+            }
+
+            return null;
+        }
+
+        public enum Mode
+        {
+            Rgb,        
+            Greyscale
         }
 
         public void Dispose()
