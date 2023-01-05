@@ -35,14 +35,14 @@ namespace Recognizer.Grpc.Services
 
             Task.WhenAll(detect1, detect2);
 
-            var detectt1 = detect1.Result.Select(it => (double)it);
-            var detectt2 = detect2.Result.Select(it => (double)it);
+            var detectt1 = detect1.Result.ToList();
+            var detectt2 = detect2.Result.ToList();
+            
+            var euclidean = LrNorm.Euclidean<float>(detectt1, detectt2);
+            var manhattan = LrNorm.Manhattan<float>(detectt1, detectt2);
+            var cosine = Cosine.Distance<float>(detectt1, detectt2);
 
-            var euclidean = LrNorm.Euclidean<double>(detectt1.ToList(), detectt2.ToList());
-            var manhattan = LrNorm.Manhattan<double>(detectt1.ToList(), detectt2.ToList());
-            var cosine = Cosine.Distance<double>(detectt1.ToList(), detectt2.ToList());
-
-            var confidencePercentage = (100 - (cosine + euclidean));
+            var confidencePercentage = (100 - (cosine + euclidean + manhattan));
 
 
             return Task.FromResult(
@@ -50,10 +50,10 @@ namespace Recognizer.Grpc.Services
                 {
                     RequestId = request.RequestId,
                     StatusMessage = outMessage 
-                    + " - euclidean: " + euclidean.ToString() 
-                    + " - manhattan: " + manhattan.ToString() 
-                    + " - cosine: " + cosine.ToString()
-                    + " - confidencePercentage: " + confidencePercentage.ToString(),
+                    + "\n - euclidean: " + euclidean.ToString() 
+                    + "\n - manhattan: " + manhattan.ToString() 
+                    + "\n - cosine: " + cosine.ToString()
+                    + "\n - confidencePercentage: " + confidencePercentage.ToString(),
                 });
         }
     }

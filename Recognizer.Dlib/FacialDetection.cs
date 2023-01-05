@@ -61,7 +61,7 @@ namespace Recognizer.Dlib.Wrapper
 
                     if (facesDetector.Length != 1)
                     {
-                        processMessage = "multiple  encountered";
+                        processMessage = "multiple encountered";
                         return null;
                     }
 
@@ -120,9 +120,9 @@ namespace Recognizer.Dlib.Wrapper
             finally
             {
                 bitmapImage.Dispose();                
-                Console.WriteLine("Memory Load Bytes:" + GC.GetGCMemoryInfo().MemoryLoadBytes);
-                Console.WriteLine("Total Avaible Memory Bytes:" + GC.GetGCMemoryInfo().TotalAvailableMemoryBytes);
-                Console.WriteLine("Total Commited Bytes:" + GC.GetGCMemoryInfo().TotalCommittedBytes);
+                //Console.WriteLine("Memory Load Bytes:" + GC.GetGCMemoryInfo().MemoryLoadBytes);
+                //Console.WriteLine("Total Avaible Memory Bytes:" + GC.GetGCMemoryInfo().TotalAvailableMemoryBytes);
+                //Console.WriteLine("Total Commited Bytes:" + GC.GetGCMemoryInfo().TotalCommittedBytes);
                 if (GC.GetGCMemoryInfo().MemoryLoadBytes > 0) 
                     GC.AddMemoryPressure(GC.GetGCMemoryInfo().MemoryLoadBytes);
             }     
@@ -181,59 +181,54 @@ namespace Recognizer.Dlib.Wrapper
             try
             {
                 bitmapData = bitmap.LockBits(rect, ImageLockMode.ReadOnly, pixelFormat);
-                byte[] array = new byte[width * height * num2];
-                try
+                byte[] array = new byte[width * height * num2];         
+                fixed (byte* ptr = &array[0])
                 {
-                    fixed (byte* ptr = &array[0])
+                    byte* ptr2 = ptr;
+                    switch (num)
                     {
-                        byte* ptr2 = ptr;
-                        switch (num)
-                        {
-                            case 1:
+                        case 1:
+                            {
+                                IntPtr scan = bitmapData.Scan0;
+                                int stride2 = bitmapData.Stride;
+                                for (int k = 0; k < height; k++)
                                 {
-                                    IntPtr scan = bitmapData.Scan0;
-                                    int stride2 = bitmapData.Stride;
-                                    for (int k = 0; k < height; k++)
-                                    {
-                                        Marshal.Copy(IntPtr.Add(scan, k * stride2), array, k * width, width * num2);
-                                    }
-
-                                    break;
+                                    Marshal.Copy(IntPtr.Add(scan, k * stride2), array, k * width, width * num2);
                                 }
-                            case 3:
-                            case 4:
+
+                                break;
+                            }
+                        case 3:
+                        case 4:
+                            {
+                                byte* ptr3 = (byte*)(void*)bitmapData.Scan0;
+                                int stride = bitmapData.Stride;
+                                for (int i = 0; i < height; i++)
                                 {
-                                    byte* ptr3 = (byte*)(void*)bitmapData.Scan0;
-                                    int stride = bitmapData.Stride;
-                                    for (int i = 0; i < height; i++)
+                                    int num3 = i * stride;
+                                    int num4 = i * width * num2;
+                                    for (int j = 0; j < width; j++)
                                     {
-                                        int num3 = i * stride;
-                                        int num4 = i * width * num2;
-                                        for (int j = 0; j < width; j++)
-                                        {
-                                            ptr2[num4 + j * num2] = ptr3[num3 + j * num + 2];
-                                            ptr2[num4 + j * num2 + 1] = ptr3[num3 + j * num + 1];
-                                            ptr2[num4 + j * num2 + 2] = ptr3[num3 + j * num];
-                                        }
+                                        ptr2[num4 + j * num2] = ptr3[num3 + j * num + 2];
+                                        ptr2[num4 + j * num2 + 1] = ptr3[num3 + j * num + 1];
+                                        ptr2[num4 + j * num2 + 2] = ptr3[num3 + j * num];
                                     }
-
-                                    break;
                                 }
-                        }
 
-                        IntPtr array2 = (IntPtr)ptr;
-                        switch (mode)
-                        {
-                            case Mode.Rgb:
-                                return new Matrix<RgbPixel>(array2, height, width, width * 3);
-                            case Mode.Greyscale:
-                                return null;
-                        }
+                                break;
+                            }
+                    }
+
+                    IntPtr array2 = (IntPtr)ptr;
+                    switch (mode)
+                    {
+                        case Mode.Rgb:
+                            return new Matrix<RgbPixel>(array2, height, width, width * 3);
+                        case Mode.Greyscale:
+                            return null;
                     }
                 }
-                finally
-                {
-                }
+           
             }
             finally
             {

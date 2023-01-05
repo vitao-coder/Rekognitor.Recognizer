@@ -27,7 +27,7 @@ RUN apt-get update \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app/Dlib/
-#RUN git clone https://github.com/vitao-coder/DlibDotNet
+
 RUN git clone https://github.com/takuya-takeuchi/DlibDotNet
 
 WORKDIR /app/

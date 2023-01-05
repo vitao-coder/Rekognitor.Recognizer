@@ -6,7 +6,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:8009"
+      "applicationUrl": "http://localhost:8080;http://localhost:443"
     },
     "https": {
       "commandName": "Project",
@@ -14,15 +14,15 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7092;http://localhost:8010"
+      //"applicationUrl": "http://localhost:443;https://localhost:8010"
     },
     "Docker": {
       "commandName": "Docker",
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
       "publishAllPorts": true,
       "useSSL": true,
-      "httpPort": 8009,
-      "sslPort": 8010,
+      "httpPort": 8080,
+      "sslPort": 443,
       "DockerfileRunArguments": "--memory-reservation 500m -m 650m --memory-swap 651m"
     }
   }

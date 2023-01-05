@@ -21,7 +21,7 @@ namespace Recognizer.Dlib.Wrapper
             _modelLoader = modelLoader;
             var lossMetric = modelLoader.GetModel((int)AVAIABLE_MODELS.RessNet);
             if (lossMetric != null)
-                _lossMetric = LossMetric.Deserialize(lossMetric.Data);
+                _lossMetric = LossMetric.Deserialize(lossMetric.Data);            
         }
 
         public LossMetric GetLossMetrics() {
