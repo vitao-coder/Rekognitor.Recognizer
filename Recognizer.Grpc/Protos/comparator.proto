@@ -18,4 +18,7 @@ message ComparisonRequest {
 message ComparisonReply {	
 	double score = 1;
 	string error = 2;
+	bool isSame=3;	  
+	double euclideanDistance = 4;
+	double cosineDistance = 5 ;
 }

@@ -1,7 +1,8 @@
 using Grpc.Core;
 using RecognizerGrpc;
 using Recognizer.IOC;
-using Recognizer.Grpc.Services.Math;
+using Recognizer.Grpc.Services.Similarity;
+using System.Linq;
 
 namespace Recognizer.Grpc.Services
 {
@@ -35,17 +36,29 @@ namespace Recognizer.Grpc.Services
 
             Task.WhenAll(detect1, detect2);
 
-            var detectt1 = detect1.Result.ToList();
-            var detectt2 = detect2.Result.ToList();
-            
-            var cosine = Cosine.Distance<float>(detectt1, detectt2);
+            var detectt1 = detect1.Result;
+            var detectt2 = detect2.Result;
+
+            var cosine = Similarity.Similarity.CosineSimilarity(detectt1, detectt2);
+            var euclidean = Similarity.Similarity.EuclideanDistance(detectt1, detectt2);
+
+            var score = Compare(detectt1, detectt2);
             if (outMessage == "success") outMessage = "";
             return Task.FromResult(
                 new ComparisonReply
                 {
-                    Score = cosine,
-                    Error = outMessage,
+                    Score = score,
+                    Error = outMessage,     
+                    CosineDistance = cosine,
+                    EuclideanDistance = euclidean
                 });
+        }
+        static private double Compare(float[] faceA, float[] faceB)
+        {
+            double result = 0;
+            for (int i = 0; i < faceA.Length; i++)
+                result = result + System.Math.Pow(faceA[i] - faceB[i], 2);
+            return result;
         }
     }
 }
