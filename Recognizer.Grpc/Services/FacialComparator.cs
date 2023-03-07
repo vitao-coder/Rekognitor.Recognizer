@@ -38,22 +38,13 @@ namespace Recognizer.Grpc.Services
             var detectt1 = detect1.Result.ToList();
             var detectt2 = detect2.Result.ToList();
             
-            var euclidean = LrNorm.Euclidean<float>(detectt1, detectt2);
-            var manhattan = LrNorm.Manhattan<float>(detectt1, detectt2);
             var cosine = Cosine.Distance<float>(detectt1, detectt2);
-
-            var confidencePercentage = (100 - (cosine + euclidean + manhattan));
-
-
+            if (outMessage == "success") outMessage = "";
             return Task.FromResult(
                 new ComparisonReply
                 {
-                    RequestId = request.RequestId,
-                    StatusMessage = outMessage 
-                    + "\n - euclidean: " + euclidean.ToString() 
-                    + "\n - manhattan: " + manhattan.ToString() 
-                    + "\n - cosine: " + cosine.ToString()
-                    + "\n - confidencePercentage: " + confidencePercentage.ToString(),
+                    Score = cosine,
+                    Error = outMessage,
                 });
         }
     }

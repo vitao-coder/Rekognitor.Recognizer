@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mediapipe.Net" Version="0.8.10" />
+    <PackageReference Include="Mediapipe.Net.Framework.Protobuf" Version="0.8.9.1" />
+    <PackageReference Include="Mediapipe.Net.Runtime.CPU" Version="0.8.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Recognizer.IOC\Recognizer.IOC.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Solutions\" />
+  </ItemGroup>
+
+</Project>

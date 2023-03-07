@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recognizer.Grpc", "Recogniz
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recognizer.Dlib.Wrapper", "Recognizer.Dlib\Recognizer.Dlib.Wrapper.csproj", "{4E87F860-B427-4692-BD4B-06C015212B2A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recognizer.OpenCV", "Recognizer.OpenCV\Recognizer.OpenCV.csproj", "{680CBFA9-3EA0-4AE8-9A06-DB4DA3D58D1E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recognizer.IOC", "Recognizer.IOC\Recognizer.IOC.csproj", "{39C55639-F34C-4AA3-A8AE-EE4ABF403A85}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{4E87F860-B427-4692-BD4B-06C015212B2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E87F860-B427-4692-BD4B-06C015212B2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E87F860-B427-4692-BD4B-06C015212B2A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{680CBFA9-3EA0-4AE8-9A06-DB4DA3D58D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{680CBFA9-3EA0-4AE8-9A06-DB4DA3D58D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{680CBFA9-3EA0-4AE8-9A06-DB4DA3D58D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{680CBFA9-3EA0-4AE8-9A06-DB4DA3D58D1E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{39C55639-F34C-4AA3-A8AE-EE4ABF403A85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{39C55639-F34C-4AA3-A8AE-EE4ABF403A85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39C55639-F34C-4AA3-A8AE-EE4ABF403A85}.Release|Any CPU.ActiveCfg = Release|Any CPU

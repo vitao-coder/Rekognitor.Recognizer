@@ -18,12 +18,14 @@
     },
     "Docker": {
       "commandName": "Docker",
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
-      "publishAllPorts": true,
-      "useSSL": true,
-      "httpPort": 8080,
-      "sslPort": 443,
-      "DockerfileRunArguments": "--memory-reservation 500m -m 650m --memory-swap 651m"
+      "environmentVariables": {        
+        "ASPNETCORE_URLS": "https://localhost:8082;http://localhost:8083"
+      },
+      "DockerfileRunArguments": "--memory-reservation 500m -m 650m --memory-swap 651m",
+      "httpPort": 8082,
+      "launchUrl": "{Scheme}://{ServiceHost}",
+      "sslPort": 8083,
+      "useSSL": true
     }
   }
 }

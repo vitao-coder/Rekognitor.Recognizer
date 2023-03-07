@@ -15,7 +15,7 @@ message ComparisonRequest {
 	bytes image_bytes2 = 3;
 }
 
-message ComparisonReply {
-	string request_id = 1;  	
-	string statusMessage = 3;
+message ComparisonReply {	
+	double score = 1;
+	string error = 2;
 }

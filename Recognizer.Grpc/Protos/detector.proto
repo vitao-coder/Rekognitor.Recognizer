@@ -15,11 +15,6 @@ message DetectionRequest {
 }
 
 message DetectionReply {
-	string request_id = 1;  
-	array128D array128D = 2;
-	string statusMessage = 3;
-}
-
-message array128D {
-    repeated float array = 1 [packed=true];
+	repeated float landmark = 1 [packed=false];
+	string error = 2;
 }
