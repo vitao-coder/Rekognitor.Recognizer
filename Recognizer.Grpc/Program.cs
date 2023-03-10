@@ -21,8 +21,7 @@ namespace Recognizer.Grpc
 
             // Configure Kestrel to listen on a specific HTTP port 
             builder.WebHost.ConfigureKestrel(options =>
-            {                
-                options.ListenAnyIP(8083);
+            {   
                 options.ListenAnyIP(8082, listenOptions =>
                 {                    
                     listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
