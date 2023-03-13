@@ -18,5 +18,4 @@
   <ItemGroup>
     <PackageReference Include="DlibDotNet" Version="19.21.0.20220724" />
   </ItemGroup>
-
 </Project>
