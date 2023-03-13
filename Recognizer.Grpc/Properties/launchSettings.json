@@ -19,12 +19,12 @@
     "Docker": {
       "commandName": "Docker",
       "environmentVariables": {
-        "ASPNETCORE_URLS": "https://*:8084;http://*:8083"
+        "ASPNETCORE_URLS": "https://*:443;http://*:8080"
       },
       "DockerfileRunArguments": "--memory-reservation 500m -m 650m --memory-swap 651m",
-      "httpPort": 8083,
+      "httpPort": 8080,
       "launchUrl": "{Scheme}://{ServiceHost}",
-      "sslPort": 8084,
+      "sslPort": 443,
       "useSSL": true
     }
   }

@@ -18,12 +18,13 @@ namespace Recognizer.Grpc
             builder.Services.AddSingleton<ShapePrediction>(); 
             builder.Services.AddSingleton<LossMetrics>();
             builder.Services.AddGrpc();
+            builder.Services.AddHealthChecks();
 
             // Configure Kestrel to listen on a specific HTTP port 
             builder.WebHost.ConfigureKestrel(options =>
             {
                 options.ListenAnyIP(443);
-                options.ListenAnyIP(80, listenOptions =>
+                options.ListenAnyIP(8080, listenOptions =>
                 {
                     listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
                 });
@@ -35,7 +36,6 @@ namespace Recognizer.Grpc
             app.Services.GetService<ShapePrediction>();
             app.Services.GetService<LossMetrics>();
             app.Services.GetService<FrontalFacialDetector>();
-
 
             app.MapGrpcService<Services.FacialDetector>();
             app.MapGrpcService<Services.FacialComparator>();
